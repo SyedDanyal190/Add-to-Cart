@@ -1,31 +1,73 @@
 import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { removeFromCart } from '../redux/cartSlice';
-import { AppDispatch, RootState } from '../redux/store';
+import type { RootState, AppDispatch } from '../redux/store';
+import { removeFromCart, increaseQuantity, decreaseQuantity, clearCart } from '../redux/cartSlice';
+import { toast } from 'react-toastify';
 
-const Cart:React.FC = () => {
-const dispatch = useDispatch<AppDispatch>();
-const items = useSelector((state: RootState) => state.cart.items);
+const Cart: React.FC = () => {
+  const items = useSelector((state: RootState) => state.cart.items);
+  const dispatch = useDispatch<AppDispatch>();
+
+  const total = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
   return (
-    <div className="p-4 mt-6 border-t">
-      <h2 className="text-xl font-bold mb-4">Cart</h2>
+    <div className="max-w-4xl mx-auto p-4 mt-24">
+      <h1 className="text-3xl font-bold mb-6">Your Cart</h1>
+
       {items.length === 0 ? (
-        <p className="text-gray-600">Cart is empty.</p>
+        <p className="text-gray-600">Your cart is empty.</p>
       ) : (
-        <ul className="space-y-2">
-          {items.map(item => (
-            <li key={item.id} className="flex justify-between items-center border-b pb-2">
-              <span>{item.name} - ${item.price}</span>
-              <button
-                onClick={() => dispatch(removeFromCart(item))}
-                className="text-red-500 hover:underline"
-              >
-                Remove
-              </button>
-            </li>
-          ))}
-        </ul>
+        <>
+          <ul className="space-y-4 mb-6">
+            {items.map(item => (
+              <li key={item.id} className="flex justify-between items-center border-b pb-4">
+                <div>
+                  <h2 className="text-lg font-semibold">{item.name}</h2>
+                  <p className="text-gray-600">${item.price.toFixed(2)}</p>
+                  <div className="flex items-center mt-2 space-x-2">
+                    <button
+                      onClick={() => dispatch(decreaseQuantity({ id: item.id }))}
+                      className="bg-gray-300 px-2 rounded"
+                    >
+                      −
+                    </button>
+                    <span>{item.quantity}</span>
+                    <button
+                      onClick={() => dispatch(increaseQuantity({ id: item.id }))}
+                      className="bg-gray-300 px-2 rounded"
+                    >
+                      +
+                    </button>
+                  </div>
+                </div>
+                <button
+                  onClick={() => {
+                    dispatch(removeFromCart({ id: item.id }));
+                    toast.error(`${item.name} removed from cart`);
+                  }}
+                  className="text-red-600 hover:underline"
+                >
+                  Remove
+                </button>
+              </li>
+            ))}
+          </ul>
+
+          <div className="flex justify-between items-center     ">
+            <button
+              onClick={() => {
+                dispatch(clearCart());
+                toast.info('Cart cleared');
+              }}
+              className="bg-red-500 text-green px-4 py-2 rounded hover:bg-red-600"
+            >
+              Clear Cart
+            </button>
+            <div className="text-right font-bold text-xl">
+              Total: ${total.toFixed(2)}
+            </div>
+          </div>
+        </>
       )}
     </div>
   );
