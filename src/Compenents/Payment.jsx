@@ -9,7 +9,7 @@ import {
 
 const stripePromise = loadStripe('pk_test_51N5NonBbjyr5g6XBvyPXdgl3TbNdY3vrEzR7EGvGBWUOqtZzRPez3TVgyy3kGTM7Vw1LHMqrblLQE8um1XRTv70P00aJ9Emjyq'); // Your Stripe publishable key
 
-const CheckoutForm = ({amount ,items }) => {
+const CheckoutForm  = ({amount ,items }) => {
   const stripe = useStripe();
   const elements = useElements();
   // const [amount, setAmount] = useState(1000);
